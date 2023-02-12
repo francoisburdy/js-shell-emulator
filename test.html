@@ -1,66 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<title>terminal.js test</title>
-		<script src="terminal.js"></script>
-	</head>
-	<body>
-		<h1>terminal.js test</h1>
+<head>
+  <meta charset="utf-8"/>
+  <title>terminal.js manual test</title>
+  <script src="terminal.js"></script>
+  <style>
+      .customized-line {
+          font-weight: bold;
+          background-color: #ff9292;
+          color: black;
+      }
+  </style>
+</head>
+<body>
+<h1>terminal.js manual test suite</h1>
 
-		<button onclick="t1.beep()">Play the beep!</button>
-		<br>
-		<br>
+<div id="terminal-1"></div>
+<div id="terminal-2-container"></div>
+<div id="terminal-3"></div>
+<div id="terminal-4"></div>
+<br/>
+<br/>
 
-		<script>
-			var t1 = new Terminal()
-			t1.setHeight("200px")
-			t1.setWidth('600px')
-			document.body.appendChild(t1.html)
+<script>
+  let t1 = new Terminal("terminal-1")
+  t1.setHeight("180px")
+    .setWidth('600px')
 
-			var t2 = new Terminal()
-			t2.setHeight("250px")
-			t2.setWidth('650px')
-			t2.setBackgroundColor('blue')
-			t2.blinkingCursor(false)
-			document.body.appendChild(t2.html)
+  t1.print(`Hello, world! I'm terminal-1`)
+    .setPrompt('> ')
+    .input('Whats your name?', (input) => {
+      t1.print(`Welcome, ${input}`)
 
-			t1.print('Hello, world!')
-			t1.input('Whats your name?', function (input) {
-				t1.print('Welcome, ' + input)
+      t2Element = document.createElement('div');
+      t2Element.id = "terminal-2"
+      let t2 = new Terminal(t2Element)
+      t2.setHeight("150px")
+        .setWidth('650px')
+        .setBackgroundColor('blue')
 
-				t2.sleep(1000, function () {
-					t2.print('Hello again!')
-					t2.input('Whats your name again?', function (input) {
-						t2.print('Welcome again, ' + input)
-					})
-				})
-			})
+      document.getElementById("terminal-2-container").appendChild(t2.html);
 
-			var t3 = new Terminal('terminal_3')
-			t3.setHeight("180px")
-			t3.setWidth('550px')
-			t3.setBackgroundColor('green')
-			document.body.appendChild(t3.html)
-			t3.password('Enter password:', function (password) {
-				t3.print('Your password is: ' + password)
-			})
+      t2.sleep(200, () => {
+        t2.print('Hello again! I\'m terminal-2.')
+          .print("I'll ask you a few tasks to ensure the module is still working fine.")
+          .pause('PRESS ANY KEY IF THAT\'S OK FOR YOU', () => {
+            t2.print(`Great!`)
+              .write("I can write...")
+              .sleep(800, () => {
+                t2.write('on a single line. ')
+                  .sleep(800, () => {
+                    t2.write("Isn't it?")
+                      .sleep(800, () => {
+                        t2.newLine()
+                          .newLine()
+                          .print("But also break a few lines")
+                          .newLine()
+                          .newLine()
+                          .newLine()
+                          .print("Impressive.. uh?")
+                          .setBlinking(false)
+                          .sleep(500, () => {
+                            t3.setVisible(true)
+                              .setBlinking(true)
+                              .print("Hi, I'm terminal-3.")
+                              .printHTML("<strong class='customized-line'>Here's an HTML tag.</strong> <a href='https://github.com/francoisburdy/terminal-js'>Github Link</a>")
+                              .password('Enter password (a fake one! I\'ll display it):', password => {
+                                t3.print(`Your password is: ${password}`)
+                                t4.setVisible(true).focus();
+                              })
+                          })
+                      })
+                  })
+              })
+          })
+      })
+    })
 
-			var paragraph = document.createElement("p")
-			var t3bySelector = document.querySelector("#terminal_3")
-			paragraph.innerHTML = t3bySelector && t3bySelector.id ? 'The 3rd terminal has id: ' + t3bySelector.id : 'Assigning an id at initialization doesnt semm to work!'
-			document.body.appendChild(paragraph)
+  var t3 = new Terminal('terminal-3')
 
-			var t4 = new Terminal('terminal_3')
-			t4.setHeight("180px")
-			t4.setWidth('550px')
-			t4.setBackgroundColor('green')
-			document.body.appendChild(t4.html)
-			t4.confirm('Are you sure?', function (didConfirm) {
-				t4.print(didConfirm ? 'OK' : 'Why not?')
-			})
+  t3.setHeight("120px")
+    .setWidth('550px')
+    .setBlinking(false)
+    .setBackgroundColor('#07143b')
+    .setVisible(false)
 
-		</script>
 
-	</body>
+  var t4 = new Terminal('terminal-4')
+  t4.setHeight("180px")
+    .setWidth('700px')
+    .setBackgroundColor('blue')
+    .print("Hi, I'm terminal-4")
+    .setVisible(false)
+    .setPrompt('$ ')
+    .expect(['done', 'stop'], 'I expect you to type any command that is not "done" or "stop", multiple times. Can you do that?', 'Thank you. You can do that again, or use "stop" to proceed.', (command) => {
+      t4.clear()
+        .setBackgroundColor("#ffc700")
+        .setTextColor("black")
+        .print("Thanks!")
+        .setPrompt('> ')
+        .confirm("Now check the DevTools console, there should be no error. Is that ok?", (didConfirm) => {
+          if (didConfirm) {
+            t4.setBackgroundColor("#00c142")
+              .setTextSize("1.5em")
+              .clear()
+              .print("Amazing! Tests passed. Good bye!")
+          } else {
+            t4
+              .setBackgroundColor('red')
+              .setTextColor("white")
+              .printHTML("<strong>Damned.. would you please open an issue on the <a href='https://github.com/francoisburdy/terminal-js'>GitHub repo</a>?</strong>")
+          }
+
+        })
+
+
+    })
+
+  t1.focus()
+
+</script>
+
+</body>
 </html>
