@@ -5,14 +5,14 @@ JS Shell Emulator is a dead simple pure JavaScript library for emulating a shell
 
 ### Install
 
-`npm i terminal-js-emulator`
+`npm i js-shell-emulator`
 
 ### Usage example
 
 ```javascript
-import Terminal from 'terminal-js-emulator';
+import JsShell from 'js-shell-emulator';
 
-let t1 = new Terminal('terminal-1');
+let t1 = new JsShell('shell-1');
 t1.setHeight("400px");
 t1.print('This is sample with some additional logic:')
   .print(`Are you ready? Let's go!`)
@@ -46,7 +46,7 @@ fires. The callback takes one argument, which is the user input.
 
     .password(message, callback)
 
-The same as input but the input of the user will be hidden just like an old-fashioned terminal.
+The same as input but the input of the user will be hidden just like an old-fashioned shell.
 
     .confirm(message, callback)
 
@@ -84,8 +84,8 @@ Set to true by default.
 
     .html
 
-This is the top DOM element of the terminal instance. If you want to modify styling via CSS, all instances belong to a
-.Terminal class.
+This is the top DOM element of the shell instance. If you want to modify styling via CSS, all instances belong to a
+.jsShell class.
 
 ### License
 

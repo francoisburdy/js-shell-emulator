@@ -1,9 +1,9 @@
-/*! terminal.js | https://github.com/francoisburdy/terminaljs */
+/*! jsShell.js | https://github.com/francoisburdy/js-shell-emulator */
 
 const VERSION = '4.0.0';
 
 
-class Terminal {
+class JsShell {
 
   // Prompt types
   static PROMPT_INPUT = 1;
@@ -18,16 +18,16 @@ class Terminal {
     if (typeof container === 'string') {
       containerNode = document.getElementById(container)
       if (!containerNode) {
-        throw new Error(`Failed instantiating Terminal object: dom node with id "${container}" not found in document.`);
+        throw new Error(`Failed instantiating JsShell object: dom node with id "${container}" not found in document.`);
       }
     } else if (container instanceof Element) {
       containerNode = container
     } else {
-      throw new Error("Terminal.js constructor requires parameter \"container\' to be a dom Element or node string ID");
+      throw new Error("JsShell constructor requires parameter \"container\' to be a dom Element or node string ID");
     }
 
     this.html = document.createElement('div');
-    this.html.className = options.className || 'terminal';
+    this.html.className = options.className || 'jsShell';
 
     this._innerWindow = document.createElement('div');
     this._output = document.createElement('p');
@@ -111,6 +111,22 @@ class Terminal {
     return this;
   }
 
+  async type(message, speed = 50) {
+    return new Promise(async (resolve) => {
+      let newLine = document.createElement('span')
+      this._output.appendChild(newLine)
+      const timeout = (ms) => {
+        return new Promise(resolve2 => setTimeout(resolve2, ms))
+      }
+      for await (const char of message) {
+        await timeout(speed);
+        newLine.textContent += char;
+        this.scrollBottom();
+      }
+      resolve();
+    })
+  }
+
   printHTML(message) {
     let newLine = document.createElement('div')
     newLine.innerHTML = `${message}`;
@@ -138,7 +154,7 @@ class Terminal {
   }
 
   promptInput = (message, promptType, callback) => {
-    let shouldDisplayInput = (promptType === Terminal.PROMPT_INPUT || promptType === Terminal.PROMPT_CONFIRM);
+    let shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
     let inputField = document.createElement('input');
 
     inputField.style.position = 'absolute';
@@ -154,7 +170,7 @@ class Terminal {
     this.fireCursorInterval(inputField);
 
     if (message.length) {
-      this.printHTML(promptType === Terminal.PROMPT_CONFIRM ? `${message} (y/n)` : message);
+      this.printHTML(promptType === JsShell.PROMPT_CONFIRM ? `${message} (y/n)` : message);
     }
 
     inputField.onblur = () => {
@@ -185,7 +201,7 @@ class Terminal {
         this._inputLine.textContent = inputField.value;
       }
 
-      if (promptType === Terminal.PROMPT_CONFIRM && !this.isKeyEnter(e)) {
+      if (promptType === JsShell.PROMPT_CONFIRM && !this.isKeyEnter(e)) {
         if (e.code !== 'KeyY' && e.code !== 'KeyN') { // PROMPT_CONFIRM accept only "Y" and "N"
           this._inputLine.textContent = inputField.value = '';
           return;
@@ -195,7 +211,7 @@ class Terminal {
         }
       }
 
-      if (promptType === Terminal.PROMPT_PAUSE) {
+      if (promptType === JsShell.PROMPT_PAUSE) {
         callback();
         inputField.blur()
         this.html.removeChild(inputField);
@@ -205,7 +221,7 @@ class Terminal {
 
       if (this.isKeyEnter(e)) {
 
-        if (promptType === Terminal.PROMPT_CONFIRM) {
+        if (promptType === JsShell.PROMPT_CONFIRM) {
           if (!inputValue.length) { // PROMPT_CONFIRM doesn't accept empty string. It requires answer.
             return;
           }
@@ -217,7 +233,7 @@ class Terminal {
         }
 
         if (typeof (callback) === 'function') {
-          if (promptType === Terminal.PROMPT_CONFIRM) {
+          if (promptType === JsShell.PROMPT_CONFIRM) {
             if (inputValue.toUpperCase()[0] === 'Y') {
               callback(true);
             } else if (inputValue.toUpperCase()[0] === 'N') {
@@ -249,22 +265,22 @@ class Terminal {
   }
 
   input(message, callback) {
-    this.promptInput(message, Terminal.PROMPT_INPUT, callback);
+    this.promptInput(message, JsShell.PROMPT_INPUT, callback);
     return this;
   }
 
   pause(message, callback) {
-    this.promptInput(message, Terminal.PROMPT_PAUSE, callback);
+    this.promptInput(message, JsShell.PROMPT_PAUSE, callback);
     return this;
   }
 
   password(message, callback) {
-    this.promptInput(message, Terminal.PROMPT_PASSWORD, callback);
+    this.promptInput(message, JsShell.PROMPT_PASSWORD, callback);
     return this;
   }
 
   confirm(message, callback) {
-    this.promptInput(message, Terminal.PROMPT_CONFIRM, callback);
+    this.promptInput(message, JsShell.PROMPT_CONFIRM, callback);
     return this;
   }
 
@@ -276,6 +292,10 @@ class Terminal {
   sleep(milliseconds, callback) {
     setTimeout(callback, milliseconds);
     return this;
+  }
+
+  static async sleep(milliseconds) {
+    await new Promise(resolve => setTimeout(resolve, milliseconds));
   }
 
   setTextSize(size) {
@@ -324,7 +344,7 @@ class Terminal {
   }
 
   getVersion() {
-    console.info(`TerminalJS ${VERSION}`)
+    console.info(`JS Shell Emulator ${VERSION}`)
     return VERSION;
   }
 
@@ -347,4 +367,4 @@ class Terminal {
 
 }
 
-export { Terminal }
+export { JsShell }

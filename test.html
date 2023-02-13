@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>terminal.js manual test</title>
+  <title>jsShell.js manual test</title>
   <style>
       .customized-line {
           font-weight: bold;
@@ -16,97 +16,90 @@
   </style>
 </head>
 <body>
-<h1>terminal.js manual test suite</h1>
-<div id="terminal-1"></div>
-<div id="terminal-2-container"></div>
-<div id="terminal-3"></div>
-<div id="terminal-4"></div>
+<h1>jsShell.js manual test suite</h1>
+<div id="shell-1"></div>
+<div id="shell-2-container"></div>
+<div id="shell-3"></div>
+<div id="shell-4"></div>
 <button id="restart-btn" onclick="startTestSuite()">Restart test suite</button>
 <br/>
 <br/>
 
 <script type="module">
-  import { Terminal } from "./terminal.js";
+  import { JsShell } from "./jsShell.js";
 
   const startTestSuite = async () => {
-    let t2Container = document.getElementById("terminal-2-container")
+    let t2Container = document.getElementById("shell-2-container")
     t2Container.innerHTML = '';
     let restartBtn = document.getElementById('restart-btn');
     restartBtn.style.display = 'none';
 
-    let t1 = new Terminal("terminal-1", { cursorType: 'thin', cursorSpeed: 400 })
+    let t1 = new JsShell("shell-1")
     window.t1 = t1;
     t1.setHeight("100px")
       .setWidth('600px')
-      .print(`Hello, world! I'm terminal-1`);
-
-    let uneValeur = await t1.sleep2(1000);
-    console.log(uneValeur);
-
-    t1.print(`Hello, again! I'm terminal-1`)
+      .print(`Hello, world! I'm shell-1`)
       .setPrompt('> ')
-      .input('Whats your name?', (input) => {
+      .input('Whats your name?', async (input) => {
         t1.print(`Welcome, ${input}`)
 
         let t2Element = document.createElement('div');
-        t2Element.id = "terminal-2"
-        let t2 = new Terminal(t2Element)
+        t2Element.id = "shell-2"
+        let t2 = new JsShell(t2Element)
         t2.setHeight("150px")
           .setWidth('650px')
           .setBackgroundColor('blue')
 
         t2Container.appendChild(t2.html);
+        t2.print('Hello again! I\'m shell-2.')
+          .print("I'll ask you a few tasks to ensure the module is still working fine.")
+          .pause('PRESS ANY KEY IF THAT\'S OK FOR YOU', async () => {
+            t2.print(`Great!`);
+            await t2.type("I can write...");
+            await JsShell.sleep(500);
+            await t2.type('on a single line. ');
+            await JsShell.sleep(500);
+            t2.write("Cool isn't it?")
+            await JsShell.sleep(500);
+            t2.newLine()
+              .newLine()
+              .print("But also break a few lines")
+              .newLine()
+              .newLine()
+              .newLine()
+              .print("Impressive.. uh?");
+            await JsShell.sleep(500);
 
-        t2.sleep(200, () => {
-          t2.print('Hello again! I\'m terminal-2.')
-            .print("I'll ask you a few tasks to ensure the module is still working fine.")
-            .pause('PRESS ANY KEY IF THAT\'S OK FOR YOU', () => {
-              t2.print(`Great!`)
-                .write("I can write...")
-                .sleep(800, () => {
-                  t2.write('on a single line. ')
-                    .sleep(800, () => {
-                      t2.write("Isn't it?")
-                        .sleep(800, () => {
-                          t2.newLine()
-                            .newLine()
-                            .print("But also break a few lines")
-                            .newLine()
-                            .newLine()
-                            .newLine()
-                            .print("Impressive.. uh?")
-                            .sleep(500, () => {
-                              t3.setVisible(true)
-                                .print("Hi, I'm terminal-3.")
-                                .printHTML("<strong class='customized-line'>Here's a customized HTML tag.</strong>")
-                                .printHTML("<a href='https://github.com/js-shell-emulator/terminal-js'>Github Link</a>")
-                                .password('Enter password (a fake one! I\'ll display it):', password => {
-                                  t3.print(`Your password is: ${password}`)
-                                  t4.setVisible(true).focus();
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
+            t3.setVisible(true)
+              .print("Hi, I'm shell-3.")
+              .printHTML("<strong class='customized-line'>Here's a customized HTML tag.</strong>")
+              .printHTML("<a href='https://github.com/francoisburdy/js-shell-emulator'>Github Link</a>")
+              .password('Enter password (a fake one! I\'ll display it):', (password) => {
+                t3.print(`Your password is: ${password}`)
+                t4.setVisible(true).focus();
+              })
+          })
+
       })
 
-    let t3 = new Terminal('terminal-3', {
+    let t3 = new JsShell('shell-3', {
       height: '150px',
       width: '550px',
       backgroundColor: '#f1f2f5',
       textColor: 'black',
     })
-
     t3.setVisible(false)
 
+    let t4 = new JsShell('shell-4', {
+      fontFamily: 'monospace',
+      cursorType: 'thin',
+      cursorSpeed: 400,
+    })
 
-    let t4 = new Terminal('terminal-4')
     t4.setHeight("180px")
       .setWidth('700px')
-      .setBackgroundColor('blue')
-      .print("Hi, I'm terminal-4")
+      .setBackgroundColor('darkblue')
+      .print("Hi, I'm shell-4")
       .setVisible(false)
       .setPrompt('$ ')
       .expect(['done', 'stop'], 'I expect you to type any command that <strong>IS NOT</strong> "done" or "stop", multiple times. Can you do that?', 'Thank you. You can do that again, or use "stop" to proceed.', (command) => {
@@ -125,7 +118,7 @@
               t4
                 .setBackgroundColor('red')
                 .setTextColor("white")
-                .printHTML("<strong>Damned...would you please open an issue on the <a href='https://github.com/francoisburdy/terminal-js'>GitHub repo</a>?</strong>")
+                .printHTML("<strong>Damned...would you please open an issue on the <a href='https://github.com/francoisburdy/js-shell-emulator'>GitHub repo</a>?</strong>")
             }
 
             restartBtn.style.display = 'block';
