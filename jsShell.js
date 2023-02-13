@@ -2,7 +2,6 @@
 
 const VERSION = '4.0.0';
 
-
 class JsShell {
 
   // Prompt types
@@ -153,135 +152,133 @@ class JsShell {
     this.html.scrollTop = this.html.scrollHeight;
   }
 
-  promptInput = (message, promptType, callback) => {
-    let shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
-    let inputField = document.createElement('input');
+  async _prompt(message, promptType) {
+    return new Promise(async (resolve) => {
+      let shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
+      let inputField = document.createElement('input');
 
-    inputField.style.position = 'absolute';
-    inputField.style.zIndex = '-100';
-    inputField.style.outline = 'none';
-    inputField.style.border = 'none';
-    inputField.style.opacity = '0';
-    inputField.style.fontSize = '0.2em';
+      inputField.style.position = 'absolute';
+      inputField.style.zIndex = '-100';
+      inputField.style.outline = 'none';
+      inputField.style.border = 'none';
+      inputField.style.opacity = '0';
+      inputField.style.fontSize = '0.2em';
 
-    this._inputLine.textContent = '';
-    this._input.style.display = 'block';
-    this.html.appendChild(inputField);
-    this.fireCursorInterval(inputField);
+      this._inputLine.textContent = '';
+      this._input.style.display = 'block';
+      this.html.appendChild(inputField);
+      this.fireCursorInterval(inputField);
 
-    if (message.length) {
-      this.printHTML(promptType === JsShell.PROMPT_CONFIRM ? `${message} (y/n)` : message);
-    }
-
-    inputField.onblur = () => {
-      this._cursor.style.display = 'none';
-    }
-
-    inputField.onfocus = () => {
-      inputField.value = this._inputLine.textContent;
-      this._cursor.style.display = 'inline-block';
-    }
-
-    this.html.onclick = () => {
-      inputField.focus();
-    }
-
-    inputField.onkeydown = (e) => {
-      if (e.code === 'ArrowUp' || e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.code === 'ArrowDown' || e.code === 'Tab') {
-        e.preventDefault();
-      }
-      // keep cursor visible while active typing
-      this._cursor.style.visibility = 'visible';
-    }
-
-    inputField.onkeyup = (e) => {
-      this.fireCursorInterval(inputField)
-      let inputValue = inputField.value;
-      if (shouldDisplayInput && !this.isKeyEnter(e)) {
-        this._inputLine.textContent = inputField.value;
+      if (message.length) {
+        this.printHTML(promptType === JsShell.PROMPT_CONFIRM ? `${message} (y/n)` : message);
       }
 
-      if (promptType === JsShell.PROMPT_CONFIRM && !this.isKeyEnter(e)) {
-        if (e.code !== 'KeyY' && e.code !== 'KeyN') { // PROMPT_CONFIRM accept only "Y" and "N"
-          this._inputLine.textContent = inputField.value = '';
-          return;
+      inputField.onblur = () => {
+        this._cursor.style.display = 'none';
+      }
+
+      inputField.onfocus = () => {
+        inputField.value = this._inputLine.textContent;
+        this._cursor.style.display = 'inline-block';
+      }
+
+      this.html.onclick = () => {
+        inputField.focus();
+      }
+
+      inputField.onkeydown = (e) => {
+        if (e.code === 'ArrowUp' || e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.code === 'ArrowDown' || e.code === 'Tab') {
+          e.preventDefault();
         }
-        if (this._inputLine.textContent.length > 1) { // PROMPT_CONFIRM accept only one character
-          this._inputLine.textContent = inputField.value = this._inputLine.textContent.substr(-1);
+        // keep cursor visible while active typing
+        this._cursor.style.visibility = 'visible';
+      }
+
+      inputField.onkeyup = (e) => {
+        this.fireCursorInterval(inputField)
+        let inputValue = inputField.value;
+        if (shouldDisplayInput && !this.isKeyEnter(e)) {
+          this._inputLine.textContent = inputField.value;
         }
-      }
 
-      if (promptType === JsShell.PROMPT_PAUSE) {
-        callback();
-        inputField.blur()
-        this.html.removeChild(inputField);
-        this.scrollBottom();
-        return;
-      }
-
-      if (this.isKeyEnter(e)) {
-
-        if (promptType === JsShell.PROMPT_CONFIRM) {
-          if (!inputValue.length) { // PROMPT_CONFIRM doesn't accept empty string. It requires answer.
+        if (promptType === JsShell.PROMPT_CONFIRM && !this.isKeyEnter(e)) {
+          if (e.code !== 'KeyY' && e.code !== 'KeyN') { // PROMPT_CONFIRM accept only "Y" and "N"
+            this._inputLine.textContent = inputField.value = '';
             return;
           }
-        }
-
-        this._input.style.display = 'none';
-        if (shouldDisplayInput) {
-          this.print(this._promptPS.textContent + inputValue);
-        }
-
-        if (typeof (callback) === 'function') {
-          if (promptType === JsShell.PROMPT_CONFIRM) {
-            if (inputValue.toUpperCase()[0] === 'Y') {
-              callback(true);
-            } else if (inputValue.toUpperCase()[0] === 'N') {
-              callback(false);
-            } else {
-              throw new Error(`PROMPT_CONFIRM failed: Invalid input (${inputValue.toUpperCase()[0]}})`);
-            }
-          } else {
-            callback(inputValue);
+          if (this._inputLine.textContent.length > 1) { // PROMPT_CONFIRM accept only one character
+            this._inputLine.textContent = inputField.value = this._inputLine.textContent.substr(-1);
           }
-          this.html.removeChild(inputField); // remove input field in the end of each callback
-          this.scrollBottom(); // scroll to the bottom of the terminal
         }
 
-      }
-    }
-    inputField.focus();
-  }
+        if (promptType === JsShell.PROMPT_PAUSE) {
+          resolve();
+          inputField.blur()
+          this.html.removeChild(inputField);
+          this.scrollBottom();
+          return;
+        }
 
-  expect(cmdList, inputMessage, notFoundMessage, callback) {
-    this.input(inputMessage, (input) => {
-      if (cmdList.includes(input)) {
-        return callback(input);
+        if (this.isKeyEnter(e)) {
+
+          if (promptType === JsShell.PROMPT_CONFIRM) {
+            if (!inputValue.length) { // PROMPT_CONFIRM doesn't accept empty string. It requires answer.
+              return;
+            }
+          }
+
+          this._input.style.display = 'none';
+          if (shouldDisplayInput) {
+            this.print(this._promptPS.textContent + inputValue);
+          }
+
+          if (typeof (resolve) === 'function') {
+            if (promptType === JsShell.PROMPT_CONFIRM) {
+              if (inputValue.toUpperCase()[0] === 'Y') {
+                resolve(true);
+              } else if (inputValue.toUpperCase()[0] === 'N') {
+                resolve(false);
+              } else {
+                throw new Error(`PROMPT_CONFIRM failed: Invalid input (${inputValue.toUpperCase()[0]}})`);
+              }
+            } else {
+              resolve(inputValue);
+            }
+            this.html.removeChild(inputField); // remove input field in the end of each callback
+            this.scrollBottom(); // scroll to the bottom of the terminal
+          }
+
+        }
       }
-      return this
-        .expect(cmdList, notFoundMessage, notFoundMessage, callback); // notFoundMessage used twice, intentionally.
+      inputField.focus();
     })
-    return this;
+
   }
 
-  input(message, callback) {
-    this.promptInput(message, JsShell.PROMPT_INPUT, callback);
-    return this;
+  async expect(cmdList, inputMessage, notFoundMessage) {
+    return new Promise(async (resolve) => {
+      let cmd = await this.input(inputMessage);
+      while (!cmdList.includes(cmd)) {
+        cmd = await this.input(notFoundMessage)
+      }
+      resolve(cmd)
+    })
   }
 
-  pause(message, callback) {
-    this.promptInput(message, JsShell.PROMPT_PAUSE, callback);
-    return this;
+  async input(message) {
+    return await this._prompt(message, JsShell.PROMPT_INPUT)
   }
 
-  password(message, callback) {
-    this.promptInput(message, JsShell.PROMPT_PASSWORD, callback);
-    return this;
+  async pause(message) {
+    return await this._prompt(message, JsShell.PROMPT_PAUSE)
   }
 
-  confirm(message, callback) {
-    this.promptInput(message, JsShell.PROMPT_CONFIRM, callback);
-    return this;
+  async password(message) {
+    return await this._prompt(message, JsShell.PROMPT_PASSWORD)
+  }
+
+  async confirm(message) {
+    return await this._prompt(message, JsShell.PROMPT_CONFIRM)
   }
 
   clear() {

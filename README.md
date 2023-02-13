@@ -61,14 +61,12 @@ Clears the screen.
 
 You can customize your PS1 for the prompt. It can be set and override at any point of time.
 
-    .sleep(milliseconds, callback)
+```js
+JsShell.sleep(milliseconds)
+```
 
 Works exactly like the JavaScript "setTimeout" function. Waits for the number of milliseconds given, then executes the
 callback.
-
-    .beep()
-
-**DISMISSED** from v. 3.0. Plays a retro digital tone.
 
     .setTextSize()
     .setTextColor()
@@ -91,7 +89,7 @@ This is the top DOM element of the shell instance. If you want to modify styling
 
 The MIT License
 
-Copyright (c) 2014 Erik Österberg, François Burdy
+Copyright (c) 2014 François Burdy, Erik Österberg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

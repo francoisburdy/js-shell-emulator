@@ -39,56 +39,65 @@
     t1.setHeight("100px")
       .setWidth('600px')
       .print(`Hello, world! I'm shell-1`)
-      .setPrompt('> ')
-      .input('Whats your name?', async (input) => {
-        t1.print(`Welcome, ${input}`)
+      .setPrompt('> ');
 
-        let t2Element = document.createElement('div');
-        t2Element.id = "shell-2"
-        let t2 = new JsShell(t2Element)
-        t2.setHeight("150px")
-          .setWidth('650px')
-          .setBackgroundColor('blue')
+    let name = await t1.input('Whats your name?');
 
-        t2Container.appendChild(t2.html);
-        t2.print('Hello again! I\'m shell-2.')
-          .print("I'll ask you a few tasks to ensure the module is still working fine.")
-          .pause('PRESS ANY KEY IF THAT\'S OK FOR YOU', async () => {
-            t2.print(`Great!`);
-            await t2.type("I can write...");
-            await JsShell.sleep(500);
-            await t2.type('on a single line. ');
-            await JsShell.sleep(500);
-            t2.write("Cool isn't it?")
-            await JsShell.sleep(500);
-            t2.newLine()
-              .newLine()
-              .print("But also break a few lines")
-              .newLine()
-              .newLine()
-              .newLine()
-              .print("Impressive.. uh?");
-            await JsShell.sleep(500);
-
-            t3.setVisible(true)
-              .print("Hi, I'm shell-3.")
-              .printHTML("<strong class='customized-line'>Here's a customized HTML tag.</strong>")
-              .printHTML("<a href='https://github.com/francoisburdy/js-shell-emulator'>Github Link</a>")
-              .password('Enter password (a fake one! I\'ll display it):', (password) => {
-                t3.print(`Your password is: ${password}`)
-                t4.setVisible(true).focus();
-              })
-          })
-
-      })
+    t1.print(`Welcome, ${name}`)
 
     let t3 = new JsShell('shell-3', {
       height: '150px',
       width: '550px',
       backgroundColor: '#f1f2f5',
       textColor: 'black',
-    })
-    t3.setVisible(false)
+    }).setVisible(false);
+
+    let t2Element = document.createElement('div');
+    t2Element.id = "shell-2"
+    let t2 = new JsShell(t2Element)
+    t2.setHeight("150px")
+      .setWidth('650px')
+      .setBackgroundColor('blue')
+
+    t2Container.appendChild(t2.html);
+    t2.print('Hello again! I\'m shell-2.')
+      .print("I'll ask you a few tasks to ensure the module is still working fine.");
+
+    await t2.pause('PRESS ANY KEY IF THAT\'S OK FOR YOU');
+
+    t2.print(`Great!`);
+    await t2.type("I can write...");
+    await JsShell.sleep(500);
+    await t2.type('on a single line. ');
+    await JsShell.sleep(500);
+    t2.write("Cool isn't it?")
+    await JsShell.sleep(500);
+    t2.newLine()
+      .newLine()
+      .print("But also break a few lines")
+      .newLine()
+      .newLine()
+      .newLine()
+      .print("Impressive.. uh?");
+
+    await JsShell.sleep(500);
+
+    t3.setVisible(true)
+      .print("Hi, I'm shell-3.")
+      .printHTML("<strong class='customized-line'>Here's a customized HTML tag.</strong>")
+      .printHTML("<a href='https://github.com/francoisburdy/js-shell-emulator'>Github Link</a>");
+
+    let password = await t3.password("Enter password (a fake one! I'll display it):");
+
+    t3.print(`Your password is: ${password}`)
+      .print('Please go back to shell-2');
+
+    t2.clear()
+      .focus()
+      .setPrompt('> ')
+    await t2.expect(['next'], 'type "next" please', 'try again');
+
+    t2.print('thanks');
 
     let t4 = new JsShell('shell-4', {
       fontFamily: 'monospace',
@@ -100,32 +109,33 @@
       .setWidth('700px')
       .setBackgroundColor('darkblue')
       .print("Hi, I'm shell-4")
-      .setVisible(false)
-      .setPrompt('$ ')
-      .expect(['done', 'stop'], 'I expect you to type any command that <strong>IS NOT</strong> "done" or "stop", multiple times. Can you do that?', 'Thank you. You can do that again, or use "stop" to proceed.', (command) => {
-        t4.clear()
-          .setBackgroundColor("#ffc700")
-          .setTextColor("black")
-          .print("Thanks!")
-          .setPrompt('> ')
-          .confirm("Now check the DevTools console, there should be no JavaScript error. Is that ok?", (didConfirm) => {
-            if (didConfirm) {
-              t4.setBackgroundColor("#00c142")
-                .setTextSize("1.5em")
-                .clear()
-                .print("Amazing! Tests passed. Good bye!")
-            } else {
-              t4
-                .setBackgroundColor('red')
-                .setTextColor("white")
-                .printHTML("<strong>Damned...would you please open an issue on the <a href='https://github.com/francoisburdy/js-shell-emulator'>GitHub repo</a>?</strong>")
-            }
+      .setPrompt('$ ');
 
-            restartBtn.style.display = 'block';
-          })
-      })
+    await t4.expect(
+      ['done', 'stop'],
+      'I expect you to type any command that <strong>IS NOT</strong> "done" or "stop", multiple times. Can you do that?',
+      'Thank you. You can do that again, or use "stop" to proceed.'
+    )
 
-    t1.focus()
+    t4.clear()
+      .setBackgroundColor("#ffc700")
+      .setTextColor("black")
+      .print("Thanks!")
+      .setPrompt('> ');
+
+    let didConfirm = await t4.confirm("Now check the DevTools console, there should be no JavaScript error. Is that ok?")
+
+    if (didConfirm) {
+      t4.setBackgroundColor("#00c142")
+        .setTextSize("1.5em")
+        .clear()
+        .print("Amazing! Tests passed. Good bye!")
+    } else {
+      t4.setBackgroundColor('red')
+        .setTextColor("white")
+        .printHTML("<strong>Damned...would you please open an issue on the <a href='https://github.com/francoisburdy/js-shell-emulator'>GitHub repo</a>?</strong>")
+    }
+    restartBtn.style.display = 'block';
   }
 
   window.startTestSuite = startTestSuite;
