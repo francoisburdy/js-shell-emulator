@@ -15,6 +15,9 @@ class JsShell {
     let containerNode;
 
     if (typeof container === 'string') {
+      if (container.charAt(0) === "#") {
+        container = container.substring(1);
+      }
       containerNode = document.getElementById(container)
       if (!containerNode) {
         throw new Error(`Failed instantiating JsShell object: dom node with id "${container}" not found in document.`);
@@ -47,13 +50,13 @@ class JsShell {
     this._innerWindow.appendChild(this._input);
     this.html.appendChild(this._innerWindow);
 
-    this.setBackgroundColor(options.backgroundColor || 'black')
+    this.setBackgroundColor(options.backgroundColor || '#000')
       .setFontFamily(options.fontFamily || 'Ubuntu Mono, Monaco, Courier, monospace')
-      .setTextColor(options.textColor || 'white')
+      .setTextColor(options.textColor || '#fff')
       .setTextSize(options.textSize || '1em')
       .setPrompt(options.promptPS || '')
       .setWidth(options.width || '100%')
-      .setHeight(options.height || '100%');
+      .setHeight(options.height || '300px');
 
     this.html.style.margin = options.margin || '0';
     this.html.style.overflow = options.overflow || 'auto';
@@ -283,11 +286,6 @@ class JsShell {
 
   clear() {
     this._output.innerHTML = '';
-    return this;
-  }
-
-  sleep(milliseconds, callback) {
-    setTimeout(callback, milliseconds);
     return this;
   }
 

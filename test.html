@@ -34,45 +34,43 @@
     let restartBtn = document.getElementById('restart-btn');
     restartBtn.style.display = 'none';
 
-    let t1 = new JsShell("shell-1")
-    window.t1 = t1;
-    t1.setHeight("100px")
+
+    let sh1 = new JsShell("shell-1")
+    sh1.setHeight("100px")
       .setWidth('600px')
       .print(`Hello, world! I'm shell-1`)
       .setPrompt('> ');
+    let name = await sh1.input("What's your name?")
+    sh1.print(`Welcome, ${name}`)
 
-    let name = await t1.input('Whats your name?');
-
-    t1.print(`Welcome, ${name}`)
-
-    let t3 = new JsShell('shell-3', {
+    let sh3 = new JsShell('#shell-3', {
       height: '150px',
       width: '550px',
       backgroundColor: '#f1f2f5',
       textColor: 'black',
     }).setVisible(false);
 
-    let t2Element = document.createElement('div');
-    t2Element.id = "shell-2"
-    let t2 = new JsShell(t2Element)
-    t2.setHeight("150px")
+    let sh2Element = document.createElement('div');
+    sh2Element.id = "shell-2"
+    let sh2 = new JsShell(sh2Element)
+    sh2.setHeight("150px")
       .setWidth('650px')
       .setBackgroundColor('blue')
 
-    t2Container.appendChild(t2.html);
-    t2.print('Hello again! I\'m shell-2.')
+    t2Container.appendChild(sh2.html);
+    sh2.print('Hello again! I\'m shell-2.')
       .print("I'll ask you a few tasks to ensure the module is still working fine.");
 
-    await t2.pause('PRESS ANY KEY IF THAT\'S OK FOR YOU');
+    await sh2.pause('PRESS ANY KEY IF THAT\'S OK FOR YOU');
 
-    t2.print(`Great!`);
-    await t2.type("I can write...");
+    sh2.print(`Great!`);
+    await sh2.type("I can write...");
     await JsShell.sleep(500);
-    await t2.type('on a single line. ');
+    await sh2.type('on a single line. ');
     await JsShell.sleep(500);
-    t2.write("Cool isn't it?")
+    sh2.write("Cool isn't it?")
     await JsShell.sleep(500);
-    t2.newLine()
+    sh2.newLine()
       .newLine()
       .print("But also break a few lines")
       .newLine()
@@ -82,56 +80,56 @@
 
     await JsShell.sleep(500);
 
-    t3.setVisible(true)
+    sh3.setVisible(true)
       .print("Hi, I'm shell-3.")
       .printHTML("<strong class='customized-line'>Here's a customized HTML tag.</strong>")
       .printHTML("<a href='https://github.com/francoisburdy/js-shell-emulator'>Github Link</a>");
 
-    let password = await t3.password("Enter password (a fake one! I'll display it):");
+    let password = await sh3.password("Enter password (a fake one! I'll display it):");
 
-    t3.print(`Your password is: ${password}`)
+    sh3.print(`Your password is: ${password}`)
       .print('Please go back to shell-2');
 
-    t2.clear()
+    sh2.clear()
       .focus()
       .setPrompt('> ')
-    await t2.expect(['next'], 'type "next" please', 'try again');
+    await sh2.expect(['next'], 'type "next" please', 'try again');
 
-    t2.print('thanks');
+    sh2.print('thanks');
 
-    let t4 = new JsShell('shell-4', {
+    let sh4 = new JsShell('shell-4', {
       fontFamily: 'monospace',
       cursorType: 'thin',
       cursorSpeed: 400,
     })
 
-    t4.setHeight("180px")
+    sh4.setHeight("180px")
       .setWidth('700px')
       .setBackgroundColor('darkblue')
       .print("Hi, I'm shell-4")
       .setPrompt('$ ');
 
-    await t4.expect(
+    await sh4.expect(
       ['done', 'stop'],
       'I expect you to type any command that <strong>IS NOT</strong> "done" or "stop", multiple times. Can you do that?',
       'Thank you. You can do that again, or use "stop" to proceed.'
     )
 
-    t4.clear()
+    sh4.clear()
       .setBackgroundColor("#ffc700")
       .setTextColor("black")
       .print("Thanks!")
       .setPrompt('> ');
 
-    let didConfirm = await t4.confirm("Now check the DevTools console, there should be no JavaScript error. Is that ok?")
+    let didConfirm = await sh4.confirm("Now check the DevTools console, there should be no JavaScript error. Is that ok?")
 
     if (didConfirm) {
-      t4.setBackgroundColor("#00c142")
+      sh4.setBackgroundColor("#00c142")
         .setTextSize("1.5em")
         .clear()
         .print("Amazing! Tests passed. Good bye!")
     } else {
-      t4.setBackgroundColor('red')
+      sh4.setBackgroundColor('red')
         .setTextColor("white")
         .printHTML("<strong>Damned...would you please open an issue on the <a href='https://github.com/francoisburdy/js-shell-emulator'>GitHub repo</a>?</strong>")
     }
