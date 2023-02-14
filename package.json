@@ -1,6 +1,6 @@
 {
   "name": "js-shell-emulator",
-  "version": "4.0.0",
+  "version": "1.0.0",
   "description": "JS Shell Emulator is a dead simple JavaScript library for emulating a terminal environment",
   "main": "jsShell.js",
   "scripts": {

@@ -1,6 +1,6 @@
 /*! jsShell.js | https://github.com/francoisburdy/js-shell-emulator */
 
-const VERSION = '4.0.0';
+const VERSION = '1.0.0';
 
 class JsShell {
 
