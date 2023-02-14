@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>jsShell.js simple demo</title>
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .jsShell a {
+        color: white
+    }
+</style>
+<body>
+<div id="shell"></div>
+<script type="module">
+  import { JsShell } from "../jsShell.js";
+
+  let shell = new JsShell("shell")
+  shell
+    .setWidth("100%")
+    .setHeight("100vh")
+    .setPrompt('$ ')
+    .print(`Hello, world!`)
+    .printHTML("This is a very basic <a href='https://github.com/francoisburdy/js-shell-emulator'>francoisburdy/js-shell-emulator</a> demo.")
+    .printHTML(`See source code <a href="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/simple.html">here</a>.`)
+    .print('Try any command.')
+    .newLine();
+
+  let input;
+  while (true) {
+    input = await shell.input()
+    if (input === 'exit') {
+      break
+    }
+    shell.print(`Command ${input} not found. Type "exit" to finish.`).newLine()
+  }
+
+  shell.print('Bye!')
+
+</script>
+</body>
+</html>

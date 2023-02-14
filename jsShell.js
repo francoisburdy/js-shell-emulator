@@ -155,7 +155,7 @@ class JsShell {
     this.html.scrollTop = this.html.scrollHeight;
   }
 
-  async _prompt(message, promptType) {
+  async _prompt(message = '', promptType) {
     return new Promise(async (resolve) => {
       let shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
       let inputField = document.createElement('input');
