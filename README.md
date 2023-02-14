@@ -8,7 +8,13 @@ async/await functions and features enriched.
 
 ## Install
 
-`npm i js-shell-emulator`
+```bash
+# Using NPM
+npm install js-shell-emulator`
+
+# Using Yarn
+yarn add js-shell-emulator
+```
 
 ## Get started
 
@@ -22,7 +28,7 @@ Create a container element with an id.
 Import module and create a JsShell instance.
 
 ```js
-import { JsShell } from "jsShell.js";
+import { JsShell } from "js-shell-emulator";
 
 let shell = new JsShell("#container")
 shell.print(`Hello, world!`)
@@ -69,7 +75,7 @@ let confirm = await shell.confirm("Are you sure?")
 
 #### Constructor options
 
-Below are the default options that you can pass in the constructor second parameter.
+Below are the (default) styling options that you can pass in the constructor second parameter.
 
 ```js
 const shell = new JsShell('#container', {
