@@ -5,7 +5,7 @@
   "main": "jsShell.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint --fix jsShell.js"
+    "lint": "eslint --fix *.{js,html} demos/*.{js,html}"
   },
   "repository": "git+https://github.com/francoisburdy/js-shell-emulator.git",
   "keywords": [
@@ -26,6 +26,7 @@
   "devDependencies": {
     "eslint": "^8.0.1",
     "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0"

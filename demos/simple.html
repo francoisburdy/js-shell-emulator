@@ -17,30 +17,29 @@
 <body>
 <div id="shell"></div>
 <script type="module">
-  import { JsShell } from "../jsShell.js";
+  import { JsShell } from '../jsShell.js';
 
-  let shell = new JsShell("shell")
+  const shell = new JsShell('shell');
   shell
-    .setWidth("100%")
-    .setHeight("100vh")
+    .setWidth('100%')
+    .setHeight('100vh')
     .setPrompt('$ ')
-    .print(`Hello, world!`)
+    .print('Hello, world!')
     .printHTML("This is a very basic <a href='https://github.com/francoisburdy/js-shell-emulator'>francoisburdy/js-shell-emulator</a> demo.")
-    .printHTML(`See source code <a href="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/simple.html">here</a>.`)
+    .printHTML('See source code <a href="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/simple.html">here</a>.')
     .print('Try any command.')
     .newLine();
 
   let input;
   while (true) {
-    input = await shell.input()
+    input = await shell.input();
     if (input === 'exit') {
-      break
+      break;
     }
-    shell.print(`Command ${input} not found. Type "exit" to finish.`).newLine()
+    shell.print(`Command ${input} not found. Type "exit" to finish.`).newLine();
   }
 
-  shell.print('Bye!')
-
+  shell.print('Bye!');
 </script>
 </body>
 </html>

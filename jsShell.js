@@ -1,7 +1,5 @@
 /*! jsShell.js | https://github.com/francoisburdy/js-shell-emulator */
 
-const VERSION = '1.0.0';
-
 class JsShell {
   // Prompt types
   static PROMPT_INPUT = 1;
@@ -331,11 +329,6 @@ class JsShell {
   setPrompt(promptPS) {
     this._promptPS1.innerHTML = promptPS;
     return this;
-  }
-
-  getVersion() {
-    console.info(`JS Shell Emulator ${VERSION}`);
-    return VERSION;
   }
 
   isKeyEnter(event) {

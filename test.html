@@ -26,116 +26,117 @@
 <br/>
 
 <script type="module">
-  import { JsShell } from "./jsShell.js";
+  import { JsShell } from './jsShell.js';
 
-  const startTestSuite = async () => {
-    let t2Container = document.getElementById("shell-2-container")
+  const startTestSuite = async() => {
+    const t2Container = document.getElementById('shell-2-container');
     t2Container.innerHTML = '';
-    let restartBtn = document.getElementById('restart-btn');
+
+    const restartBtn = document.getElementById('restart-btn');
     restartBtn.style.display = 'none';
 
-
-    let sh1 = new JsShell("shell-1")
-    sh1.setHeight("100px")
+    const sh1 = new JsShell('shell-1');
+    sh1.setHeight('100px')
       .setWidth('600px')
-      .print(`Hello, world! I'm shell-1`)
+      .print('Hello, world! I\'m shell-1')
       .setPrompt('> ');
-    let name = await sh1.input("What's your name?")
-    sh1.print(`Welcome, ${name}`)
 
-    let sh3 = new JsShell('#shell-3', {
+    const name = await sh1.input('What\'s your name?');
+    sh1.print(`Welcome, ${name}`);
+
+    const sh3 = new JsShell('#shell-3', {
       height: '150px',
       width: '550px',
       backgroundColor: '#f1f2f5',
-      textColor: 'black',
+      textColor: 'black'
     }).setVisible(false);
 
-    let sh2Element = document.createElement('div');
-    sh2Element.id = "shell-2"
-    let sh2 = new JsShell(sh2Element)
-    sh2.setHeight("150px")
+    const sh2Element = document.createElement('div');
+    sh2Element.id = 'shell-2';
+    const sh2 = new JsShell(sh2Element);
+    sh2.setHeight('150px')
       .setWidth('650px')
-      .setBackgroundColor('blue')
+      .setBackgroundColor('blue');
 
     t2Container.appendChild(sh2.html);
     sh2.print('Hello again! I\'m shell-2.')
-      .print("I'll ask you a few tasks to ensure the module is still working fine.");
+      .print('I\'ll ask you a few tasks to ensure the module is still working fine.');
 
     await sh2.pause('PRESS ANY KEY IF THAT\'S OK FOR YOU');
 
-    sh2.print(`Great!`);
-    await sh2.type("I can write...");
+    sh2.print('Great!');
+    await sh2.type('I can write...');
     await JsShell.sleep(500);
     await sh2.type('on a single line. ');
     await JsShell.sleep(500);
-    sh2.write("Cool isn't it?")
+    sh2.write('Cool isn\'t it?');
     await JsShell.sleep(500);
     sh2.newLine()
       .newLine()
-      .print("But also break a few lines")
+      .print('But also break a few lines')
       .newLine()
       .newLine()
       .newLine()
-      .print("Impressive.. uh?");
+      .print('Impressive.. uh?');
 
     await JsShell.sleep(500);
 
     sh3.setVisible(true)
-      .print("Hi, I'm shell-3.")
-      .printHTML("<strong class='customized-line'>Here's a customized HTML tag.</strong>")
-      .printHTML("<a href='https://github.com/francoisburdy/js-shell-emulator'>Github Link</a>");
+      .print('Hi, I\'m shell-3.')
+      .printHTML('<strong class=\'customized-line\'>Here\'s a customized HTML tag.</strong>')
+      .printHTML('<a href="https://github.com/francoisburdy/js-shell-emulator">Github Link</a>');
 
-    let password = await sh3.password("Enter password (a fake one! I'll display it):");
+    const password = await sh3.password('Enter password (a fake one! I\'ll display it):');
 
     sh3.print(`Your password is: ${password}`)
       .print('Please go back to shell-2');
 
     sh2.clear()
       .focus()
-      .setPrompt('> ')
+      .setPrompt('> ');
     await sh2.expect(['next'], 'type "next" please', 'try again');
 
     sh2.print('thanks');
 
-    let sh4 = new JsShell('shell-4', {
+    const sh4 = new JsShell('shell-4', {
       fontFamily: 'monospace',
       cursorType: 'thin',
-      cursorSpeed: 400,
-    })
+      cursorSpeed: 400
+    });
 
-    sh4.setHeight("180px")
+    sh4.setHeight('180px')
       .setWidth('700px')
       .setBackgroundColor('darkblue')
-      .print("Hi, I'm shell-4")
+      .print('Hi, I\'m shell-4')
       .setPrompt('$ ');
 
     await sh4.expect(
       ['done', 'stop'],
       'I expect you to type any command that <strong>IS NOT</strong> "done" or "stop", multiple times. Can you do that?',
       'Thank you. You can do that again, or use "stop" to proceed.'
-    )
+    );
 
     sh4.clear()
-      .setBackgroundColor("#ffc700")
-      .setTextColor("black")
-      .print("Thanks!")
+      .setBackgroundColor('#ffc700')
+      .setTextColor('black')
+      .print('Thanks!')
       .setPrompt('> ');
 
-    let didConfirm = await sh4.confirm("Now check the DevTools console, there should be no JavaScript error. Is that ok?")
+    const didConfirm = await sh4.confirm('Now check the DevTools console, there should be no JavaScript error. Is that ok?');
 
     if (didConfirm) {
-      sh4.setBackgroundColor("#00c142")
-        .print("Amazing! Tests passed. Good bye!")
+      sh4.setBackgroundColor('#00c142')
+        .print('Amazing! Tests passed. Good bye!');
     } else {
       sh4.setBackgroundColor('red')
-        .setTextColor("white")
-        .printHTML("<strong>Damned...would you please open an issue on the <a href='https://github.com/francoisburdy/js-shell-emulator'>GitHub repo</a>?</strong>")
+        .setTextColor('white')
+        .printHTML('<strong>Damned...would you please open an issue on the <a href=\'https://github.com/francoisburdy/js-shell-emulator\'>GitHub repo</a>?</strong>');
     }
     restartBtn.style.display = 'block';
-  }
+  };
 
   window.startTestSuite = startTestSuite;
-  startTestSuite()
+  startTestSuite();
 </script>
 </body>
 </html>
