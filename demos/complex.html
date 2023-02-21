@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>jsShell.js more sophisticated demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .shell {
+
+    }
+
+    .jsShell a {
+        color: white
+    }
+</style>
+<body>
+<h1 class="text-xl my-8 text-center">JS Shell Emulator demo</h1>
+<main class="grid grid-cols-1 lg:grid-cols-2">
+  <div id="shell-1" class="shell"></div>
+  <div id="shell-2" class="shell"></div>
+</main>
+
+<script type="module">
+  import { JsShell } from '../jsShell.js';
+
+  const commands = {
+    color: {
+      handler: changeColor,
+      description: 'Change background color'
+    },
+    clear: {
+      handler: (shell) => {
+        shell.clear();
+      },
+      description: 'Clear console.'
+    },
+    form: {
+      handler: form,
+      description: 'Run a cli form, just to demonstrate'
+    },
+    github: {
+      handler: () => {
+        window.location.href = 'https://github.com/francoisburdy/js-shell-emulator';
+      },
+      description: 'Redirect to package Github repo'
+    },
+    help: {
+      handler: helpMenu,
+      description: 'Show available commands'
+    },
+    joke: {
+      handler: joke,
+      description: 'Tell a joke'
+    },
+    reboot: {
+      handler: startShell,
+      description: 'restart shell process'
+    },
+    time: {
+      handler: (shell) => {
+        shell.print((new Date()).toString());
+      },
+      description: 'What time is it?'
+    }
+
+  };
+
+  const bgColors = [
+    'rgb(51 65 85)',
+    'black',
+    'rgb(85,16,16)',
+    'rgb(82,34,7)',
+    'rgb(9,64,61)',
+    'rgb(9,66,97)',
+    'rgb(63 63 70)',
+    'rgb(58,8,99)',
+    'rgb(57,27,2)'
+  ];
+
+  function padToNChars(string, size) {
+    let newString = '';
+    for (let index = 0; index < (size - string.length); index++) {
+      newString = newString + ' ';
+    }
+    return string + newString;
+  }
+
+  function helpMenu(shell) {
+    shell.printHTML('GNU Fake Shell, version 0.1.12-not-released\n' +
+      'These shell commands are defined internally.  Type \`help\' to see this list.\n' +
+      'Use Google to find out more about the shell in general and to find out more about commands not in this list.');
+
+    shell.print('--------------------------------------------------------------');
+    shell.print('| Command       |  Description                               |');
+    shell.print('|---------------|--------------------------------------------|');
+    for (const key in commands) {
+      shell.print(`| ${padToNChars(key, 14)}| ${padToNChars(commands[key].description, 43)}|`);
+    }
+    shell.print('--------------------------------------------------------------');
+  }
+
+  async function joke(shell) {
+    const response = await fetch('https://icanhazdadjoke.com/', { headers: { Accept: 'application/json' } });
+    const body = await response.json();
+    if (response.ok) {
+      await shell.type(body.joke, 20);
+    }
+  }
+
+  async function form(shell) {
+    const originalPS1 = shell._promptPS1.innerHTML;
+    shell.clear()
+      .setPrompt('> ')
+      .printHTML('<strong class="text-green-400">Please fulfill the following form. Believe it or not, data won\'t leave the browser.</strong>');
+    const name = await shell.input('What\'s your name ?');
+    shell.print(`Hello ${name}`);
+
+    await shell.newLine().input('Enter your email address');
+    await shell.newLine().password('Enter your password');
+    await JsShell.sleep(300);
+    shell.print('Thanks... Let me check that...just a second');
+    await JsShell.sleep(2000);
+    const really = await shell.newLine().confirm('You didn\'t enter your real password, did you?');
+    if (really) {
+      shell.print('Oh gosh... Be sure I accept no responsibility.').newLine();
+    } else {
+      shell.print('I like this better.');
+    }
+
+    shell.print('We\'re done. Thank you!');
+    await shell.pause('Press any key to continue');
+    shell.setPrompt(originalPS1);
+  }
+
+  function changeColor(shell) {
+    let newColor;
+    do {
+      newColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+    } while (newColor === shell.html.style.background);
+    shell.setBackgroundColor(newColor);
+  }
+
+  async function startShell(shell) {
+    shell
+      .clear()
+      .print('Hello, world!')
+      .printHTML('This is a more sophisticated <a href=\'https://github.com/francoisburdy/js-shell-emulator\'>francoisburdy/js-shell-emulator</a> demo.')
+      .printHTML('See source code <a href="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/complex.html">here</a>.')
+      .print('Type "help" to see the commands list.');
+
+    let input;
+    while (true) {
+      input = await shell.input();
+      if (!input.length) {
+        continue;
+      }
+      if (commands.hasOwnProperty(input.trim())) {
+        await commands[input.trim()].handler(shell);
+      } else {
+        shell.print(`${input}: command not found`);
+      }
+      if (input === 'exit') {
+        shell.print('Bye!');
+        break;
+      }
+    }
+  }
+
+  const options = {
+    width: '100%',
+    height: '80vh',
+    textSize: '0.9rem'
+  };
+  const shell1 = new JsShell('shell-1', {
+    backgroundColor: bgColors[1],
+    promptPS: '<strong class="text-emerald-400">\nuser@machine:~/fake/path\n$ </strong>',
+    ...options
+  });
+  const shell2 = new JsShell('shell-2', {
+    backgroundColor: bgColors[0],
+    promptPS: '\n$ ',
+    ...options
+  });
+
+  startShell(shell2);
+  startShell(shell1);
+</script>
+</body>
+</html>

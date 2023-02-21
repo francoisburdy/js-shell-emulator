@@ -257,7 +257,7 @@ class JsShell {
   }
 
   async pause(message) {
-    this._promptPS1_backup = this._promptPS1.textContent;
+    this._promptPS1_backup = this._promptPS1.innerHTML;
     this.setPrompt(message);
 
     await this._prompt(message, JsShell.PROMPT_PAUSE);
