@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <title>jsShell.js more sophisticated demo</title>
+  <title>jsShell.js demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -12,19 +12,14 @@
         padding: 0;
     }
 
-    .shell {
-
-    }
-
     .jsShell a {
         color: white
     }
 </style>
 <body>
 <h1 class="text-xl my-8 text-center">JS Shell Emulator demo</h1>
-<main class="grid grid-cols-1 lg:grid-cols-2">
+<main class="mx-auto w-full lg:w-3/4 max-w-[90rem]">
   <div id="shell-1" class="shell"></div>
-  <div id="shell-2" class="shell"></div>
 </main>
 
 <script type="module">
@@ -94,7 +89,7 @@
 
   function helpMenu(shell) {
     shell.printHTML('GNU Fake Shell, version 0.1.12-not-released\n' +
-      'These shell commands are defined internally.  Type \`help\' to see this list.\n' +
+      'These shell commands are defined internally.  Type \'help\' to see this list.\n' +
       'Use Google to find out more about the shell in general and to find out more about commands not in this list.');
 
     shell.print('--------------------------------------------------------------');
@@ -173,23 +168,14 @@
     }
   }
 
-  const options = {
+  const shell1 = new JsShell('shell-1', {
     width: '100%',
     height: '80vh',
-    textSize: '0.9rem'
-  };
-  const shell1 = new JsShell('shell-1', {
+    textSize: '0.9rem',
     backgroundColor: bgColors[1],
-    promptPS: '<strong class="text-emerald-400">\nuser@machine:~/fake/path\n$ </strong>',
-    ...options
-  });
-  const shell2 = new JsShell('shell-2', {
-    backgroundColor: bgColors[0],
-    promptPS: '\n$ ',
-    ...options
+    promptPS: '<strong class="text-emerald-400">\nuser@machine:~/fake/path\n$ </strong>'
   });
 
-  startShell(shell2);
   startShell(shell1);
 </script>
 </body>
