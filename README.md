@@ -5,7 +5,7 @@ JS Shell Emulator is a dead simple pure JavaScript library for emulating a shell
 
 [DEMO](https://francoisburdy.github.io/js-shell-emulator/demos/cli.html)
 
-<img src="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/screenshot.png" width="478">
+<img src="https://github.com/francoisburdy/js-shell-emulator/raw/master/demos/screenshot.png" width="636">
 
 This package is inspired from `eosterberg/terminaljs` but written with
 async/await functions and features enriched.
