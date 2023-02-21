@@ -7,7 +7,7 @@ JS Shell Emulator is a dead simple pure JavaScript library for emulating a shell
 
 <img src="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/screenshot.png" width="478">
 
-This package is a fork from [eosterberg/terminaljs](https://github.com/eosterberg/terminaljs), rewritten with
+This package is inspired from `eosterberg/terminaljs` but written with
 async/await functions and features enriched.
 
 ## Install
