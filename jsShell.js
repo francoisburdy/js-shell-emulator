@@ -3,39 +3,37 @@
 const VERSION = '1.0.0';
 
 class JsShell {
-
   // Prompt types
   static PROMPT_INPUT = 1;
-  static PROMPT_PASSWORD = 2
+  static PROMPT_PASSWORD = 2;
   static PROMPT_CONFIRM = 3;
   static PROMPT_PAUSE = 4;
 
   constructor(container, options = {}) {
     if (typeof container === 'string') {
-      if (container.charAt(0) === "#") {
+      if (container.charAt(0) === '#') {
         container = container.substring(1);
       }
-      this.containerNode = document.getElementById(container)
+      this.containerNode = document.getElementById(container);
       if (!this.containerNode) {
         throw new Error(`Failed instantiating JsShell object: dom node with id "${container}" not found in document.`);
       }
     } else if (container instanceof Element) {
-      this.containerNode = container
+      this.containerNode = container;
     } else {
-      throw new Error("JsShell constructor requires parameter \"container\' to be a dom Element or node string ID");
+      throw new Error('JsShell constructor requires parameter "container" to be a dom Element or node string ID');
     }
 
     this.html = document.createElement('div');
     this.html.className = options.className || 'jsShell';
-
     this._innerWindow = document.createElement('div');
     this._output = document.createElement('p');
     this._promptPS1 = document.createElement('span');
-    this._inputLine = document.createElement('span'); //the span element where the users input is put
+    this._inputLine = document.createElement('span'); // the span element where the users input is put
     this.cursorType = options.cursorType || 'large';
     this.cursorSpeed = options.cursorSpeed || 500;
     this.makeCursor();
-    this._input = document.createElement('div'); //the full element administering the user input, including cursor
+    this._input = document.createElement('div'); // the full element administering the user input, including cursor
     this._shouldBlinkCursor = true;
     this.cursorTimer = null;
     this._input.appendChild(this._promptPS1);
@@ -68,25 +66,25 @@ class JsShell {
   makeCursor() {
     if (this.cursorType === 'large') {
       this._cursor = document.createElement('span');
-      this._cursor.innerHTML = 'O'; //put something in the cursor...
+      this._cursor.innerHTML = 'O'; // put something in the cursor...
     } else {
       this._cursor = document.createElement('div');
-      this._cursor.style.borderRightStyle = 'solid'
-      this._cursor.style.borderRightColor = 'white'
-      this._cursor.style.height = '1em'
-      this._cursor.style.borderRightWidth = '3px'
-      this._cursor.style.paddingTop = '0.15em'
-      this._cursor.style.paddingBottom = '0.15em'
-      this._cursor.style.position = 'absolute'
-      this._cursor.style.zIndex = '1'
-      this._cursor.style.marginTop = '-0.15em'
+      this._cursor.style.borderRightStyle = 'solid';
+      this._cursor.style.borderRightColor = 'white';
+      this._cursor.style.height = '1em';
+      this._cursor.style.borderRightWidth = '3px';
+      this._cursor.style.paddingTop = '0.15em';
+      this._cursor.style.paddingBottom = '0.15em';
+      this._cursor.style.position = 'absolute';
+      this._cursor.style.zIndex = '1';
+      this._cursor.style.marginTop = '-0.15em';
     }
-    this._cursor.className = 'cursor'
-    this._cursor.style.display = 'none'; //then hide it
+    this._cursor.className = 'cursor';
+    this._cursor.style.display = 'none'; // then hide it
   }
 
   print(message) {
-    let newLine = document.createElement('div');
+    const newLine = document.createElement('div');
     newLine.textContent = message;
     this._output.appendChild(newLine);
     this.scrollBottom();
@@ -94,40 +92,37 @@ class JsShell {
   }
 
   newLine() {
-    let newLine = document.createElement('br');
+    const newLine = document.createElement('br');
     this._output.appendChild(newLine);
     this.scrollBottom();
     return this;
   }
 
   write(message) {
-    let newLine = document.createElement('span')
+    const newLine = document.createElement('span');
     newLine.innerHTML = `${message}`;
-    this._output.appendChild(newLine)
+    this._output.appendChild(newLine);
     this.scrollBottom();
     return this;
   }
 
   async type(message, speed = 50) {
-    return new Promise(async (resolve) => {
-      let newLine = document.createElement('span')
-      this._output.appendChild(newLine)
-      const timeout = (ms) => {
-        return new Promise(resolve2 => setTimeout(resolve2, ms))
-      }
-      for await (const char of message) {
-        await timeout(speed);
-        newLine.textContent += char;
-        this.scrollBottom();
-      }
-      resolve();
-    })
+    const newLine = document.createElement('span');
+    this._output.appendChild(newLine);
+    const timeout = (ms) => {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    };
+    for await (const char of message) {
+      await timeout(speed);
+      newLine.textContent += char;
+      this.scrollBottom();
+    }
   }
 
   printHTML(content) {
-    let newLine = document.createElement('div')
+    const newLine = document.createElement('div');
     newLine.innerHTML = `${content}`;
-    this._output.appendChild(newLine)
+    this._output.appendChild(newLine);
     this.scrollBottom();
     return this;
   }
@@ -152,9 +147,9 @@ class JsShell {
   }
 
   async _prompt(message = '', promptType) {
-    return new Promise(async (resolve) => {
-      let shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
-      let inputField = document.createElement('input');
+    return new Promise(async(resolve) => {
+      const shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
+      const inputField = document.createElement('input');
       inputField.style.position = 'relative';
       inputField.style.zIndex = '-100';
       inputField.style.outline = 'none';
@@ -176,16 +171,16 @@ class JsShell {
 
       inputField.onblur = () => {
         this._cursor.style.display = 'none';
-      }
+      };
 
       inputField.onfocus = () => {
         inputField.value = this._inputLine.textContent;
         this._cursor.style.display = 'inline-block';
-      }
+      };
 
       this.html.onclick = () => {
         inputField.focus();
-      }
+      };
 
       inputField.onkeydown = (e) => {
         if (e.code === 'ArrowUp' || e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.code === 'ArrowDown' || e.code === 'Tab') {
@@ -193,11 +188,11 @@ class JsShell {
         }
         // keep cursor visible while active typing
         this._cursor.style.visibility = 'visible';
-      }
+      };
 
       inputField.onkeyup = (e) => {
-        this.fireCursorInterval()
-        let inputValue = inputField.value;
+        this.fireCursorInterval();
+        const inputValue = inputField.value;
         if (shouldDisplayInput && !this.isKeyEnter(e)) {
           this._inputLine.textContent = inputField.value;
         }
@@ -213,7 +208,7 @@ class JsShell {
         }
 
         if (promptType === JsShell.PROMPT_PAUSE) {
-          inputField.blur()
+          inputField.blur();
           this.html.removeChild(inputField);
           this.scrollBottom();
           resolve();
@@ -244,42 +239,39 @@ class JsShell {
           this.html.removeChild(inputField); // remove input field in the end of each callback
           this.scrollBottom(); // scroll to the bottom of the terminal
         }
-      }
+      };
       inputField.focus();
-    })
-
+    });
   }
 
   async expect(cmdList, inputMessage, notFoundMessage) {
-    return new Promise(async (resolve) => {
-      let cmd = await this.input(inputMessage);
-      while (!cmdList.includes(cmd)) {
-        cmd = await this.input(notFoundMessage)
-      }
-      resolve(cmd)
-    })
+    let cmd = await this.input(inputMessage);
+    while (!cmdList.includes(cmd)) {
+      cmd = await this.input(notFoundMessage);
+    }
+    return cmd;
   }
 
   async input(message) {
-    return await this._prompt(message, JsShell.PROMPT_INPUT)
+    return await this._prompt(message, JsShell.PROMPT_INPUT);
   }
 
   async pause(message) {
     this._promptPS1_backup = this._promptPS1.textContent;
     this.setPrompt(message);
 
-    await this._prompt(message, JsShell.PROMPT_PAUSE)
+    await this._prompt(message, JsShell.PROMPT_PAUSE);
 
-    this.setPrompt(this._promptPS1_backup)
+    this.setPrompt(this._promptPS1_backup);
     this._promptPS1_backup = '';
   }
 
   async password(message) {
-    return await this._prompt(message, JsShell.PROMPT_PASSWORD)
+    return await this._prompt(message, JsShell.PROMPT_PASSWORD);
   }
 
   async confirm(message) {
-    return await this._prompt(message, JsShell.PROMPT_CONFIRM)
+    return await this._prompt(message, JsShell.PROMPT_CONFIRM);
   }
 
   clear() {
@@ -306,7 +298,7 @@ class JsShell {
   }
 
   setFontFamily(font) {
-    this.html.style.fontFamily = font
+    this.html.style.fontFamily = font;
     return this;
   }
 
@@ -342,27 +334,26 @@ class JsShell {
   }
 
   getVersion() {
-    console.info(`JS Shell Emulator ${VERSION}`)
+    console.info(`JS Shell Emulator ${VERSION}`);
     return VERSION;
   }
 
   isKeyEnter(event) {
-    return event.keyCode === 13 || event.code === 'Enter'
+    return event.keyCode === 13 || event.code === 'Enter';
   }
 
   setVisible(visible) {
-    this.html.style.display = !!visible ? 'block' : 'none';
+    this.html.style.display = visible ? 'block' : 'none';
     return this;
   }
 
   focus() {
-    let lastChild = this.html.lastElementChild;
+    const lastChild = this.html.lastElementChild;
     if (lastChild) {
       lastChild.focus();
     }
     return this;
   }
-
 }
 
-export { JsShell }
+export { JsShell };

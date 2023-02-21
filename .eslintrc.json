@@ -11,5 +11,8 @@
         "sourceType": "module"
     },
     "rules": {
+        "semi": ["error", "always"],
+        "space-before-function-paren": ["warn", "never"],
+        "no-async-promise-executor": "off"
     }
 }
