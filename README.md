@@ -105,9 +105,10 @@ You can programatically update styles using the follow setters:
   .setTextSize('0.9rem')
   .setTextColor('green')
   .setFontFamily('consolas')
-  .setBackgroundColor('black')
+  .setBackgroundColor('#000')
   .setWidth('100%')
   .setHeight('400px')
+  .setMargin('10px auto')
   .setBlinking(true) // start or stop cursor blinking
   .setPrompt('$ ')
   .setVisible(true)  // show or hide terminal

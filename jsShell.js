@@ -11,19 +11,16 @@ class JsShell {
   static PROMPT_PAUSE = 4;
 
   constructor(container, options = {}) {
-
-    let containerNode;
-
     if (typeof container === 'string') {
       if (container.charAt(0) === "#") {
         container = container.substring(1);
       }
-      containerNode = document.getElementById(container)
-      if (!containerNode) {
+      this.containerNode = document.getElementById(container)
+      if (!this.containerNode) {
         throw new Error(`Failed instantiating JsShell object: dom node with id "${container}" not found in document.`);
       }
     } else if (container instanceof Element) {
-      containerNode = container
+      this.containerNode = container
     } else {
       throw new Error("JsShell constructor requires parameter \"container\' to be a dom Element or node string ID");
     }
@@ -38,11 +35,9 @@ class JsShell {
     this.cursorType = options.cursorType || 'large';
     this.cursorSpeed = options.cursorSpeed || 500;
     this.makeCursor();
-    this._input = document.createElement('p'); //the full element administering the user input, including cursor
+    this._input = document.createElement('div'); //the full element administering the user input, including cursor
     this._shouldBlinkCursor = true;
-
     this.cursorTimer = null;
-
     this._input.appendChild(this._promptPS);
     this._input.appendChild(this._inputLine);
     this._input.appendChild(this._cursor);
@@ -56,18 +51,18 @@ class JsShell {
       .setTextSize(options.textSize || '1em')
       .setPrompt(options.promptPS || '')
       .setWidth(options.width || '100%')
-      .setHeight(options.height || '300px');
+      .setHeight(options.height || '300px')
+      .setMargin(options.margin || '0');
 
-    this.html.style.margin = options.margin || '0';
-    this.html.style.overflow = options.overflow || 'auto';
+    this.html.style.overflowY = options.overflow || 'auto';
     this.html.style.whiteSpace = options.whiteSpace || 'break-spaces';
     this._innerWindow.style.padding = options.padding || '10px';
     this._input.style.margin = '0';
     this._output.style.margin = '0';
     this._input.style.display = 'none';
 
-    containerNode.innerHTML = '';
-    containerNode.appendChild(this.html);
+    this.containerNode.innerHTML = '';
+    this.containerNode.appendChild(this.html);
   }
 
   makeCursor() {
@@ -137,40 +132,40 @@ class JsShell {
     return this;
   }
 
-  fireCursorInterval = (inputField) => {
+  fireCursorInterval() {
     if (this.cursorTimer) {
       clearTimeout(this.cursorTimer);
     }
     this.cursorTimer = setTimeout(() => {
-      if (inputField.parentElement && this._shouldBlinkCursor) {
+      if (this._shouldBlinkCursor) {
         this._cursor.style.visibility = this._cursor.style.visibility === 'visible' ? 'hidden' : 'visible';
-        this.fireCursorInterval(inputField);
+        this.fireCursorInterval();
       } else {
         this._cursor.style.visibility = 'visible';
       }
     }, this.cursorSpeed);
   };
 
-  scrollBottom = () => {
+  scrollBottom() {
     this.html.scrollTop = this.html.scrollHeight;
+    return this;
   }
 
   async _prompt(message = '', promptType) {
     return new Promise(async (resolve) => {
       let shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
       let inputField = document.createElement('input');
-
-      inputField.style.position = 'absolute';
+      inputField.style.position = 'relative';
       inputField.style.zIndex = '-100';
       inputField.style.outline = 'none';
       inputField.style.border = 'none';
       inputField.style.opacity = '0';
-      inputField.style.fontSize = '0.2em';
+      inputField.style.top = '0'; // prevents from viewport scroll moves
 
       this._inputLine.textContent = '';
       this._input.style.display = 'block';
       this.html.appendChild(inputField);
-      this.fireCursorInterval(inputField);
+      this.fireCursorInterval();
 
       if (message.length) {
         this.printHTML(promptType === JsShell.PROMPT_CONFIRM ? `${message} (y/n)` : message);
@@ -198,7 +193,7 @@ class JsShell {
       }
 
       inputField.onkeyup = (e) => {
-        this.fireCursorInterval(inputField)
+        this.fireCursorInterval()
         let inputValue = inputField.value;
         if (shouldDisplayInput && !this.isKeyEnter(e)) {
           this._inputLine.textContent = inputField.value;
@@ -215,42 +210,36 @@ class JsShell {
         }
 
         if (promptType === JsShell.PROMPT_PAUSE) {
-          resolve();
           inputField.blur()
           this.html.removeChild(inputField);
           this.scrollBottom();
+          resolve();
           return;
         }
 
         if (this.isKeyEnter(e)) {
-
           if (promptType === JsShell.PROMPT_CONFIRM) {
             if (!inputValue.length) { // PROMPT_CONFIRM doesn't accept empty string. It requires answer.
               return;
             }
           }
-
           this._input.style.display = 'none';
           if (shouldDisplayInput) {
             this.print(this._promptPS.textContent + inputValue);
           }
-
-          if (typeof (resolve) === 'function') {
-            if (promptType === JsShell.PROMPT_CONFIRM) {
-              if (inputValue.toUpperCase()[0] === 'Y') {
-                resolve(true);
-              } else if (inputValue.toUpperCase()[0] === 'N') {
-                resolve(false);
-              } else {
-                throw new Error(`PROMPT_CONFIRM failed: Invalid input (${inputValue.toUpperCase()[0]}})`);
-              }
+          if (promptType === JsShell.PROMPT_CONFIRM) {
+            if (inputValue.toUpperCase()[0] === 'Y') {
+              resolve(true);
+            } else if (inputValue.toUpperCase()[0] === 'N') {
+              resolve(false);
             } else {
-              resolve(inputValue);
+              throw new Error(`PROMPT_CONFIRM failed: Invalid input (${inputValue.toUpperCase()[0]}})`);
             }
-            this.html.removeChild(inputField); // remove input field in the end of each callback
-            this.scrollBottom(); // scroll to the bottom of the terminal
+          } else {
+            resolve(inputValue);
           }
-
+          this.html.removeChild(inputField); // remove input field in the end of each callback
+          this.scrollBottom(); // scroll to the bottom of the terminal
         }
       }
       inputField.focus();
@@ -324,6 +313,11 @@ class JsShell {
 
   setHeight(height) {
     this.html.style.height = height;
+    return this;
+  }
+
+  setMargin(margin) {
+    this.html.style.margin = margin;
     return this;
   }
 
