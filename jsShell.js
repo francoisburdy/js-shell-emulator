@@ -30,7 +30,7 @@ class JsShell {
 
     this._innerWindow = document.createElement('div');
     this._output = document.createElement('p');
-    this._promptPS = document.createElement('span');
+    this._promptPS1 = document.createElement('span');
     this._inputLine = document.createElement('span'); //the span element where the users input is put
     this.cursorType = options.cursorType || 'large';
     this.cursorSpeed = options.cursorSpeed || 500;
@@ -38,7 +38,7 @@ class JsShell {
     this._input = document.createElement('div'); //the full element administering the user input, including cursor
     this._shouldBlinkCursor = true;
     this.cursorTimer = null;
-    this._input.appendChild(this._promptPS);
+    this._input.appendChild(this._promptPS1);
     this._input.appendChild(this._inputLine);
     this._input.appendChild(this._cursor);
     this._innerWindow.appendChild(this._output);
@@ -124,9 +124,9 @@ class JsShell {
     })
   }
 
-  printHTML(message) {
+  printHTML(content) {
     let newLine = document.createElement('div')
-    newLine.innerHTML = `${message}`;
+    newLine.innerHTML = `${content}`;
     this._output.appendChild(newLine)
     this.scrollBottom();
     return this;
@@ -167,8 +167,11 @@ class JsShell {
       this.html.appendChild(inputField);
       this.fireCursorInterval();
 
+      // Show input message
       if (message.length) {
-        this.printHTML(promptType === JsShell.PROMPT_CONFIRM ? `${message} (y/n)` : message);
+        if (promptType !== JsShell.PROMPT_PAUSE) {
+          this.printHTML(promptType === JsShell.PROMPT_CONFIRM ? `${message} (y/n)` : message);
+        }
       }
 
       inputField.onblur = () => {
@@ -225,7 +228,7 @@ class JsShell {
           }
           this._input.style.display = 'none';
           if (shouldDisplayInput) {
-            this.print(this._promptPS.textContent + inputValue);
+            this.printHTML(this._promptPS1.innerHTML + inputValue);
           }
           if (promptType === JsShell.PROMPT_CONFIRM) {
             if (inputValue.toUpperCase()[0] === 'Y') {
@@ -262,7 +265,13 @@ class JsShell {
   }
 
   async pause(message) {
-    return await this._prompt(message, JsShell.PROMPT_PAUSE)
+    this._promptPS1_backup = this._promptPS1.textContent;
+    this.setPrompt(message);
+
+    await this._prompt(message, JsShell.PROMPT_PAUSE)
+
+    this.setPrompt(this._promptPS1_backup)
+    this._promptPS1_backup = '';
   }
 
   async password(message) {
@@ -328,7 +337,7 @@ class JsShell {
   }
 
   setPrompt(promptPS) {
-    this._promptPS.textContent = promptPS;
+    this._promptPS1.innerHTML = promptPS;
     return this;
   }
 
