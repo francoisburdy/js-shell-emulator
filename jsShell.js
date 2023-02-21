@@ -106,6 +106,7 @@ class JsShell {
 
   async type(message, speed = 50) {
     const newLine = document.createElement('span');
+    newLine.style.borderRight = `${this.cursorType === 'large' ? '9px' : '3px'} solid ${this._cursor.style.color}`;
     this._output.appendChild(newLine);
     const timeout = (ms) => {
       return new Promise(resolve => setTimeout(resolve, ms));
@@ -115,6 +116,7 @@ class JsShell {
       newLine.textContent += char;
       this.scrollBottom();
     }
+    newLine.style.borderRight = 'none';
   }
 
   printHTML(content) {
