@@ -173,10 +173,13 @@
     height: '80vh',
     textSize: '0.9rem',
     backgroundColor: bgColors[1],
-    promptPS: '<strong class="text-emerald-400">\nuser@machine:~/fake/path\n$ </strong>'
+    promptPS: '<strong class="text-emerald-400">\nuser@machine:~/fake/path\n$ </strong>',
+    forceFocus: false,
   });
 
   startShell(shell1);
+
+  window.shell = shell1;
 </script>
 </body>
 </html>

@@ -89,6 +89,7 @@ const shell = new JsShell('#container', {
   cursorType: 'large', // Typing cursor style: "large" ▯ or "thin" |
   cursorSpeed: 500, // blinking interval in ms
   fontFamily: 'Ubuntu Mono, Monaco, Courier, monospace',
+  forceFocus: false, // whether or not inputs should capture document focus even if active element is outside the shell
   textSize: '1em',
   promptPS: '', // Prompt PS1 prefix ($, #, > or whatever you like) 
   width: '100%', // Shell root element css width
@@ -109,6 +110,7 @@ You can programatically update styles using the follow setters:
   .setTextSize('0.9rem')
   .setTextColor('green')
   .setFontFamily('consolas')
+  .setForceFocus(true)
   .setBackgroundColor('#000')
   .setWidth('100%')
   .setHeight('400px')

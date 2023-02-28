@@ -23,6 +23,7 @@ class JsShell {
     }
 
     this.html = document.createElement('div');
+    this.html.setAttribute('tabindex', 0);
     this.html.className = options.className || 'jsShell';
     this._innerWindow = document.createElement('div');
     this._output = document.createElement('p');
@@ -45,6 +46,7 @@ class JsShell {
       .setFontFamily(options.fontFamily || 'Ubuntu Mono, Monaco, Courier, monospace')
       .setTextColor(options.textColor || '#fff')
       .setTextSize(options.textSize || '1em')
+      .setForceFocus(options.forceFocus !== false)
       .setPrompt(options.promptPS || '')
       .setWidth(options.width || '100%')
       .setHeight(options.height || '300px')
@@ -179,7 +181,9 @@ class JsShell {
       };
 
       this.html.onclick = () => {
-        inputField.focus();
+        if (this.shouldFocus()) {
+          inputField.focus();
+        }
       };
 
       inputField.onkeydown = (e) => {
@@ -240,7 +244,9 @@ class JsShell {
           this.scrollBottom(); // scroll to the bottom of the terminal
         }
       };
-      inputField.focus();
+      if (this.shouldFocus()) {
+        inputField.focus();
+      }
     });
   }
 
@@ -286,6 +292,11 @@ class JsShell {
   setTextSize(size) {
     this._output.style.fontSize = size;
     this._input.style.fontSize = size;
+    return this;
+  }
+
+  setForceFocus(focus) {
+    this._forceFocus = !!focus;
     return this;
   }
 
@@ -342,9 +353,15 @@ class JsShell {
     return this;
   }
 
+  shouldFocus() {
+    return this._forceFocus ||
+      this.html.matches(':focus-within') ||
+      this.html.matches(':hover');
+  }
+
   focus() {
     const lastChild = this.html.lastElementChild;
-    if (lastChild) {
+    if (lastChild && this.shouldFocus()) {
       lastChild.focus();
     }
     return this;
