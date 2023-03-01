@@ -152,6 +152,7 @@ class JsShell {
     return new Promise(async(resolve) => {
       const shouldDisplayInput = (promptType === JsShell.PROMPT_INPUT || promptType === JsShell.PROMPT_CONFIRM);
       const inputField = document.createElement('input');
+      inputField.setAttribute('autocapitalize', 'none');
       inputField.style.position = 'relative';
       inputField.style.zIndex = '-100';
       inputField.style.outline = 'none';
@@ -202,7 +203,7 @@ class JsShell {
         }
 
         if (promptType === JsShell.PROMPT_CONFIRM && !this.isKeyEnter(e)) {
-          if (e.code !== 'KeyY' && e.code !== 'KeyN') { // PROMPT_CONFIRM accept only "Y" and "N"
+          if (!this.isKeyYorN(e)) { // PROMPT_CONFIRM accept only "Y" and "N"
             this._inputLine.textContent = inputField.value = '';
             return;
           }
@@ -230,12 +231,13 @@ class JsShell {
             this.printHTML(this._promptPS1.innerHTML + inputValue);
           }
           if (promptType === JsShell.PROMPT_CONFIRM) {
-            if (inputValue.toUpperCase()[0] === 'Y') {
+            const confirmChar = inputValue.toUpperCase()[0];
+            if (confirmChar === 'Y') {
               resolve(true);
-            } else if (inputValue.toUpperCase()[0] === 'N') {
+            } else if (confirmChar === 'N') {
               resolve(false);
             } else {
-              throw new Error(`PROMPT_CONFIRM failed: Invalid input (${inputValue.toUpperCase()[0]}})`);
+              throw new Error(`PROMPT_CONFIRM failed: Invalid input (${confirmChar}})`);
             }
           } else {
             resolve(inputValue);
@@ -346,6 +348,20 @@ class JsShell {
 
   isKeyEnter(event) {
     return event.keyCode === 13 || event.code === 'Enter';
+  }
+
+  isKeyYorN(event) {
+    if (event.code) {
+      return event.code === 'KeyY' || event.code === 'KeyN';
+    }
+
+    // fix for Chrome Android
+    let kCd = event.keyCode || event.which;
+    if (event.srcElement && (kCd === 0 || kCd === 229)) {
+      const val = event.srcElement.value;
+      kCd = val.charCodeAt(val.length - 1);
+    }
+    return [121, 89, 78, 110].includes(kCd);
   }
 
   setVisible(visible) {
