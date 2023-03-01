@@ -13,11 +13,12 @@
     }
 
     .jsShell a {
-        color: white
+        color: white;
+        text-decoration: underline;
     }
 </style>
 <body>
-<h1 class="text-xl my-8 text-center">JS Shell Emulator demo</h1>
+<h1 class="text-xl my-8 text-center">JS Shell Emulator CLI demo</h1>
 <main class="mx-auto w-full lg:w-3/4 max-w-[90rem]">
   <div id="shell-1" class="shell"></div>
 </main>
@@ -28,7 +29,7 @@
   const commands = {
     color: {
       handler: changeColor,
-      description: 'Change background color'
+      description: 'Random background & text color'
     },
     clear: {
       handler: (shell) => {
@@ -36,9 +37,15 @@
       },
       description: 'Clear console.'
     },
+    cd: {
+      handler: (shell, argv) => {
+        shell.setPrompt(makePS1(argv[1] || '~'));
+      },
+      description: 'cd [dir] Change working directory.'
+    },
     form: {
       handler: form,
-      description: 'Run a cli form, just to demonstrate'
+      description: 'Run a cli form, just to demonstrate.'
     },
     github: {
       handler: () => {
@@ -63,13 +70,19 @@
         shell.print((new Date()).toString());
       },
       description: 'What time is it?'
+    },
+    exit: {
+      handler: (shell) => {
+        shell.print('Bye!');
+      },
+      description: 'Stop the shell prompt'
     }
 
   };
 
   const bgColors = [
-    'rgb(51 65 85)',
-    'black',
+    '#000',
+    'rgb(33,42,56)',
     'rgb(85,16,16)',
     'rgb(82,34,7)',
     'rgb(9,64,61)',
@@ -77,6 +90,13 @@
     'rgb(63 63 70)',
     'rgb(58,8,99)',
     'rgb(57,27,2)'
+  ];
+
+  const textColors = [
+    '#FFF',
+    '#0F0',
+    '#fffd2f',
+    '#ff1c1c'
   ];
 
   function padToNChars(string, size) {
@@ -107,6 +127,7 @@
     if (response.ok) {
       await shell.type(body.joke, 20);
     }
+    shell.newLine();
   }
 
   async function form(shell) {
@@ -119,9 +140,9 @@
 
     await shell.newLine().input('Enter your email address');
     await shell.newLine().password('Enter your password');
-    await JsShell.sleep(300);
-    shell.print('Thanks... Let me check that...just a second');
-    await JsShell.sleep(2000);
+
+    shell.newLine().print('Thanks... Let me check that...just a second');
+    await JsShell.sleep(1500);
     const really = await shell.newLine().confirm('You didn\'t enter your real password, did you?');
     if (really) {
       shell.print('Oh gosh... Be sure I accept no responsibility.').newLine();
@@ -129,17 +150,31 @@
       shell.print('I like this better.');
     }
 
-    shell.print('We\'re done. Thank you!');
-    await shell.pause('Press any key to continue');
+    shell.print('We\'re done. Thank you!').newLine();
+    await shell.pause('PRESS ANY KEY TO CONTINUE');
     shell.setPrompt(originalPS1);
   }
 
   function changeColor(shell) {
-    let newColor;
+    let newBgColor, newTextColor;
     do {
-      newColor = bgColors[Math.floor(Math.random() * bgColors.length)];
-    } while (newColor === shell.html.style.background);
-    shell.setBackgroundColor(newColor);
+      newBgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+    } while (newBgColor === shell.html.style.background);
+
+    do {
+      newTextColor = textColors[Math.floor(Math.random() * textColors.length)];
+    } while (newTextColor === shell.html.style.color);
+
+    shell
+      .setBackgroundColor(newBgColor)
+      .setTextColor(newTextColor);
+  }
+
+  function makePS1(path) {
+    if (path.slice(-1) !== '/') {
+      path += '/';
+    }
+    return `<strong class="text-green-400">\nuser@machine:${path}\n$ </strong>`;
   }
 
   async function startShell(shell) {
@@ -150,20 +185,18 @@
       .printHTML('See source code <a href="https://github.com/francoisburdy/js-shell-emulator/blob/master/demos/complex.html">here</a>.')
       .print('Type "help" to see the commands list.');
 
-    let input;
-    while (true) {
+    let input = '';
+    while (input !== 'exit') {
       input = await shell.input();
+      input = input.trim();
       if (!input.length) {
         continue;
       }
-      if (commands.hasOwnProperty(input.trim())) {
-        await commands[input.trim()].handler(shell);
+      const argv = input.split(' ');
+      if (Object.hasOwn(commands, argv[0])) {
+        await commands[argv[0]].handler(shell, argv);
       } else {
-        shell.print(`${input}: command not found`);
-      }
-      if (input === 'exit') {
-        shell.print('Bye!');
-        break;
+        shell.print(`${argv[0]}: command not found`);
       }
     }
   }
@@ -172,14 +205,11 @@
     width: '100%',
     height: '80vh',
     textSize: '0.9rem',
-    backgroundColor: bgColors[1],
-    promptPS: '<strong class="text-emerald-400">\nuser@machine:~/fake/path\n$ </strong>',
-    forceFocus: false,
+    backgroundColor: bgColors[0],
+    promptPS: makePS1('~/fake/path')
   });
 
   startShell(shell1);
-
-  window.shell = shell1;
 </script>
 </body>
 </html>

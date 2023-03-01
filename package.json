@@ -4,7 +4,7 @@
   "description": "JS Shell Emulator is a dead simple JavaScript library for emulating a terminal environment",
   "main": "jsShell.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Just open test.html manually\"",
     "lint": "eslint --fix *.{js,html} ./demos/*.{js,html}"
   },
   "repository": "git+https://github.com/francoisburdy/js-shell-emulator.git",
