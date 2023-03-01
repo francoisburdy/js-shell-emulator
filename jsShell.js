@@ -375,9 +375,9 @@ class JsShell {
       this.html.matches(':hover');
   }
 
-  focus() {
+  focus(force = false) {
     const lastChild = this.html.lastElementChild;
-    if (lastChild && this.shouldFocus()) {
+    if (lastChild && (this.shouldFocus() || force)) {
       lastChild.focus();
     }
     return this;
