@@ -3,18 +3,17 @@ JS Shell Emulator
 
 JS Shell Emulator is a dead simple pure JavaScript library for emulating a shell environment.
 
-[DEMO](https://francoisburdy.github.io/js-shell-emulator/demos/cli.html)
+[LIVE DEMO](https://francoisburdy.github.io/js-shell-emulator/demos/cli.html)
 
 <img src="https://github.com/francoisburdy/js-shell-emulator/raw/master/demos/screenshot.png" width="636">
 
-This package is inspired from `eosterberg/terminaljs` but written with
-async/await functions and features enriched.
+This package is inspired from `eosterberg/terminaljs` but written with async/await functions and features enriched.
 
 ## Install
 
 ```bash
 # Using NPM
-npm install js-shell-emulator`
+npm install js-shell-emulator
 
 # Using Yarn
 yarn add js-shell-emulator
@@ -35,7 +34,7 @@ Import module and create a JsShell instance.
 import { JsShell } from "js-shell-emulator";
 
 let shell = new JsShell("#container")
-shell.print(`Hello, world!`)
+shell.print('Hello, world!')
 ```
 
 ## Methods
