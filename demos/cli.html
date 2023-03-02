@@ -122,7 +122,9 @@
   }
 
   async function joke(shell) {
-    const response = await fetch('https://icanhazdadjoke.com/', { headers: { Accept: 'application/json' } });
+    const response = await fetch('https://icanhazdadjoke.com/', {
+      headers: { Accept: 'application/json' }
+    });
     const body = await response.json();
     if (response.ok) {
       await shell.type(body.joke, 20);

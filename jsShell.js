@@ -361,6 +361,7 @@ class JsShell {
       const val = event.srcElement.value;
       kCd = val.charCodeAt(val.length - 1);
     }
+    // Y and N lowercase & uppercase char codes
     return [121, 89, 78, 110].includes(kCd);
   }
 
